@@ -5,6 +5,7 @@
 "..\obj\adc.o"
 "..\obj\dac.o"
 "..\obj\gpio.o"
+"..\obj\tim.o"
 "..\obj\delay.o"
 "..\obj\sys.o"
 "..\obj\usart.o"

@@ -12,7 +12,7 @@ float xw_save[Need_Num];
 
 int main(void)
 { 
-	float frq = 0,zkb = 0,xwc = 0,xw_time = 0,k = 0;
+	float freq = 0,zkb = 0,xwc = 0,xw_time = 0,k = 0;
 	int i = 0,j = 0,xw_shunxu = 0;
 	NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);//设置系统中断优先级分组2
 	delay_init(168);      //初始化延时函数
@@ -40,10 +40,10 @@ int main(void)
 			switch(mode_flag)//低频模式
 			{
 				case Cal_Low:
-					frq = 84000000.0/rising_second;//计算频率	
-					if(frq < 10000)//判断是否为高频<10kHz
+					freq = 84000000.0/rising_second;//计算频率	
+					if(freq < 10000)//判断是否为高频<10kHz
 					{
-						printf("result.txt=\"%.4f\"",frq);
+						printf("result.txt=\"%.4f\"",freq);
 						com_end;
 						delay_ms(500);
 					}
@@ -61,8 +61,8 @@ int main(void)
 				case Cal_Hig://高频模式
 					if(CLK_NUM >= 1000)//判断是否为低频<10kHz
 					{
-						frq = CLK_NUM*0.01;
-						printf("result.txt=\"%.3f\"",frq);
+						freq = CLK_NUM*0.01;
+						printf("result.txt=\"%.3f\"",freq);
 						com_end;
 						delay_ms(400);
 					}
@@ -77,47 +77,15 @@ int main(void)
 					}
 				break;
 				case Cal_Zkb://占空比模式
-					//frq = 1/((float)rising_second/8400000);
-					//k = frq/1000*0.253;
+					//freq = 1/((float)rising_second/8400000);
+					//k = freq/1000*0.253;
 					zkb = (float)falling/(float)rising_second*100;
 					printf("result.txt=\"%.2f\"",zkb);
 					com_end;
 					delay_ms(400);
 				break;
 				case Cal_Cxw://测量相位模式
-//					if(rising_first > rising_second)
-//					{
-//						xwc = (rising_first-rising_second)/84.0;
-//					}
-//					else
-//					{
-//						xwc = (rising_second-rising_first)/84.0;
-//					}
-//					printf("result.txt=\"%.2f\"",xwc);
-//					com_end;
-//					delay_ms(300);
-//					if(xw_shunxu == 0)
-//					{
-//						xw_time = xwc;
-//						TIM5->DIER |= TIM_IT_CC1;//允许TIM5中断更新
-//						xw_shunxu = 1;
-//					}
-//					else if(xw_shunxu == 1)
-//					{
-//						TIM5->DIER &= (uint16_t)~TIM_IT_CC1;//不允许TIM5中断更新
-//						if(xwc > (xw_time/2))
-//						{
-//							printf("result.txt=\"%.2f\"",xw_time-xwc);
-//							com_end;
-//						}
-//						else
-//						{
-//							printf("result.txt=\"%.2f\"",xwc);
-//							com_end;
-//						}
-//						xw_shunxu = 0;
-//						delay_ms(300);
-//					}
+
 					xwc = rising_first/84.0;
 					if(i < 10)
 					{
@@ -171,26 +139,4 @@ int main(void)
 	}
 }
 
-//void xwpaixu()
-//{
-//	
-//}
-
-
-//for(i=0;i<10;i++)  
-//        scanf("%d",&a[i]);  
-//  
-//    for(i=0;i<9;i++)    
-//        {//n个数要进行n-1趟比较  
-//        for(j=0;j<=9-i;j++)          //每趟比较n-i次  
-//            if(a[j]>a[j+1])          //依次比较两个相邻的数，将小数放在前面，大数放在后面  
-//            {  
-//                int t=a[j];  
-//                a[j]=a[j+1];  
-//                a[j+1]=t;  
-//            }  
-//    }  
-//  
-//    for(i=0;i<10;++i)               //输出比较之后的数组  
-//        printf(" %d",a[i]);  
 

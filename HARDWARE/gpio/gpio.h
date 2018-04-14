@@ -14,7 +14,6 @@ extern u8 mode_flag;//模式选择（低频模式，高频模式，测量占空�
 
 
 void GPIO_ALLInit(void);//IO口配置
-void EXTIX_Init(void);//中断初始化
 void TIM3_Int_Init(u16 arr,u16 psc);//TIM3中断控制
 void TIM2_Counter_Init(void);//使用外部时钟计时
 void TIM2_CH1_Cap_Init(u32 arr,u16 psc);//TIM2_CH1的输入捕获初始化

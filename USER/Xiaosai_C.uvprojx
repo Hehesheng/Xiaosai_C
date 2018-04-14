@@ -365,7 +365,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F40_41xxx,USE_STDPERIPH_DRIVER</Define>
               <Undefine></Undefine>
-              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\ADC;..\HARDWARE\DAC;..\FWLIB\inc;..\HARDWARE\gpio</IncludePath>
+              <IncludePath>..\CORE;..\SYSTEM\delay;..\SYSTEM\sys;..\SYSTEM\usart;..\USER;..\HARDWARE\ADC;..\HARDWARE\DAC;..\FWLIB\inc;..\HARDWARE\gpio;..\HARDWARE\TIM</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
@@ -442,6 +442,11 @@
               <FileName>gpio.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\HARDWARE\gpio\gpio.c</FilePath>
+            </File>
+            <File>
+              <FileName>TIM.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\HARDWARE\TIM\TIM.c</FilePath>
             </File>
           </Files>
         </Group>
@@ -654,9 +659,6 @@
               <FilePath>..\FWLIB\src\stm32f4xx_wwdg.c</FilePath>
             </File>
           </Files>
-        </Group>
-        <Group>
-          <GroupName>README</GroupName>
         </Group>
       </Groups>
     </Target>
