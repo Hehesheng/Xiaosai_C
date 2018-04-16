@@ -1,11 +1,17 @@
 #include "sys.h"
 #include "usart.h"	
-#include "gpio.h"
+#include "TIM.h"
 ////////////////////////////////////////////////////////////////////////////////// 	 
 //如果使用ucos,则包括下面的头文件即可.
 #if SYSTEM_SUPPORT_OS
 #include "includes.h"					//ucos 使用	  
 #endif
+
+#define USART1_Switch 1
+#define USART2_Switch 0
+#define USART3_Switch 0
+
+#define USART1_printf(String) USART_Selet = 1;printf(String)
 //////////////////////////////////////////////////////////////////////////////////	 
 //本程序只供学习使用，未经作者许可，不得用于其它任何用途
 //ALIENTEK STM32F4探索者开发板
@@ -53,7 +59,7 @@ _sys_exit(int x)
 int fputc(int ch, FILE *f)
 { 	
 	while((USART1->SR&0X40)==0);//循环发送,直到发送完毕   
-	USART1->DR = (u8) ch;      
+	USART1->DR = (u8) ch;   
 	return ch;
 }
 #endif

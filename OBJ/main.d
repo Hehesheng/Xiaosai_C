@@ -41,3 +41,4 @@
 ..\obj\main.o: ..\HARDWARE\ADC\adc.h
 ..\obj\main.o: ..\HARDWARE\DAC\dac.h
 ..\obj\main.o: ..\HARDWARE\gpio\gpio.h
+..\obj\main.o: ..\HARDWARE\TIM\TIM.h
