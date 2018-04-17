@@ -23,6 +23,7 @@ int main(void)
 	/*
 	先用 TIM2 输入捕获的方式测量频率，若发现为高频信号，转为 TIM2 外部时钟计数模式并开启 TIM3
 	*/
+	TIM5_CH1_CH2_Cap_Init(0xffffffff,0);//定时器5捕获输入，分频1，84M时钟
 	//TIM3_Int_Init(10000-1,8400-1);	//定时器时钟84M，分频系数8400，所以84M/8400=10Khz的计数频率，计数10000次为1000ms     
 	//TIM2_Counter_Init();//TIM外部计数
 	TIM2_CH1_Cap_Init(0xffffffff,0);//定时器2捕获输入，分频1，84M时钟
@@ -42,14 +43,13 @@ int main(void)
 						delay_ms(500);
 					}
 					else
-					{
+					{//高速初始化
 						mode_flag = Cal_Hig;//切换为高频
 						ALL_UsedTIM_DEInit();
 						printf("dw.txt=\"KHz\"");//单位改变
 						com_end;
 						TIM3_Int_Init(10000-1,840-1);	//定时器时钟84M，分频系数840，所以84M/840=100Khz的计数频率，计数10000次为100ms     
 						TIM2_Counter_Init();//TIM外部计数
-						//高速初始化
 					}
 				break;
 				case Cal_Hig://高频模式
@@ -61,19 +61,16 @@ int main(void)
 						delay_ms(400);
 					}
 					else
-					{
+					{//低速初始化
 						mode_flag = Cal_Low;//切换为低频
 						ALL_UsedTIM_DEInit();
 						printf("dw.txt=\"Hz\"");//单位改变
 						com_end;
 						TIM2_CH1_Cap_Init(0xffffffff,0);//定时器2捕获输入，分频1，84M时钟
-						//低速初始化
 					}
 				break;
 				case Cal_Zkb://占空比模式
-					//freq = 1/((float)rising_second/8400000);
-					//k = freq/1000*0.253;
-					zkb = (float)falling/(float)rising_second*100;
+					zkb = (float)falling/(float)(rising_second - rising_first);//测量占空比
 					printf("result.txt=\"%.2f\"",zkb);
 					com_end;
 					delay_ms(400);

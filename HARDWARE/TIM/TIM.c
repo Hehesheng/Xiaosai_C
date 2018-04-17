@@ -13,7 +13,7 @@ u8 mode_flag = Cal_Low;//模式选择（低频模式，高频模式，测量占�
 
 //---------------------------以下中断分割线----------------------------------------------//
 
-//定时器2中断服务函数
+//TIM2中断服务函数
 void TIM2_IRQHandler(void)
 {
 	//TIM2->DIER &= (uint16_t)~TIM_IT_CC1;//不允许TIM2中断更新，防止频繁进入中断卡死
@@ -63,13 +63,31 @@ void TIM2_IRQHandler(void)
 	//TIM2->DIER |= TIM_IT_CC1;//允许TIM2中断更新，防止频繁进入中断卡死
 }
 
-//定时器3中断服务函数
+//TIM3中断服务函数
 void TIM3_IRQHandler(void)
 {
 	TIM_ClearITPendingBit(TIM3,TIM_IT_Update);  //清除中断标志位
 	CLK_NUM = TIM_GetCounter(TIM2);//读取计数
 	TIM_SetCounter(TIM2,0);//计数器清0
 	FINISH = 1;//完成读取
+}
+
+//TIM5中断服务函数
+void TIM5_IRQHandler(void)
+{
+	if(rising_flag == 0)
+	{
+		rising_first = TIM5->CCR1;
+		rising_flag = 1;
+	}
+	else
+	{
+		falling = TIM5->CCR2;
+		rising_second = TIM5->CCR1;
+		rising_flag = 0;
+		FINISH = 1;
+	}
+	TIM_ClearITPendingBit(TIM5, TIM_IT_CC1);//清除中断标志位
 }
 
 //---------------------------以上中断分割线----------------------------------------------//
@@ -179,6 +197,62 @@ void TIM3_Int_Init(u16 arr,u16 psc)
 }
 
 //---------------------------以上为高频测频初始化-----------------------------------//
+
+//---------------------------占空比初始化-----------------------------------------//
+//使用TIM5进行测量
+//功能实现简述：用同一个定时器TIM5双通道分别为上升沿和下降沿捕获
+//允许TIM5_Channel1触发更新中断，通过读取CCR寄存器获得频率及占空比
+//arr：自动重装值。
+//psc：时钟预分频数
+//定时器溢出时间计算方法:Tout=((arr+1)*(psc+1))/Ft us.
+//Ft=定时器工作频率,单位:Mhz
+void TIM5_CH1_CH2_Cap_Init(u32 arr,u16 psc)
+{
+	TIM_TimeBaseInitTypeDef  TIM_TimeBaseStructure;
+	NVIC_InitTypeDef NVIC_InitStructure;
+	TIM_ICInitTypeDef TIM5_ICInitStructure;
+
+	RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM5,ENABLE);          //TIM5时钟使能    
+
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource0,GPIO_AF_TIM5); //PA0复用位TIM5 通道1
+	GPIO_PinAFConfig(GPIOA,GPIO_PinSource1,GPIO_AF_TIM5); //PA1复用位TIM5 通道2
+
+	TIM_TimeBaseStructure.TIM_Prescaler=psc;  //定时器分频
+	TIM_TimeBaseStructure.TIM_CounterMode=TIM_CounterMode_Up; //向上计数模式
+	TIM_TimeBaseStructure.TIM_Period=arr;   //自动重装载值
+	TIM_TimeBaseStructure.TIM_ClockDivision=TIM_CKD_DIV1; 
+
+	TIM_TimeBaseInit(TIM5,&TIM_TimeBaseStructure);
+
+	//初始化TIM5输入捕获参数 通道1
+	TIM5_ICInitStructure.TIM_Channel = TIM_Channel_1; //CC1S=01         选择输入端 IC1映射到TI1上
+	TIM5_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Rising;        //上升沿捕获
+	TIM5_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; //映射到TI1上
+	TIM5_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;         //配置输入分频,不分频 
+	TIM5_ICInitStructure.TIM_ICFilter = 0x00;//IC1F=0000 配置输入滤波器 不滤波
+	TIM_ICInit(TIM5, &TIM5_ICInitStructure);
+
+	//初始化TIM5输入捕获参数 通道2
+	TIM5_ICInitStructure.TIM_Channel = TIM_Channel_2; //CC1S=02         选择输入端 IC2映射到TI2上
+	TIM5_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;        //下降沿捕获
+	TIM5_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI; //映射到TI2上
+	TIM5_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;         //配置输入分频,不分频 
+	TIM5_ICInitStructure.TIM_ICFilter = 0x00;//IC1F=0000 配置输入滤波器 不滤波
+	TIM_ICInit(TIM5, &TIM5_ICInitStructure);
+
+	TIM_ITConfig(TIM5,TIM_IT_CC1,ENABLE);//允许更新中断 ,允许CC1IE捕获中断        
+
+	TIM_Cmd(TIM5,ENABLE );         //使能定时器2
+
+	NVIC_InitStructure.NVIC_IRQChannel = TIM5_IRQn;
+	NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority=1;//抢占优先级
+	NVIC_InitStructure.NVIC_IRQChannelSubPriority =1;                //子优先级
+	NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;                        //IRQ通道使能
+	NVIC_Init(&NVIC_InitStructure);        //根据指定的参数初始化VIC寄存器   
+}
+
+
+//-------------------------------------------------------------------------------//
 
 
 //初始化，切换模式使用

@@ -15,7 +15,5 @@ extern u8 mode_flag;//模式选择（低频模式，高频模式，测量占空�
 void TIM3_Int_Init(u16 arr,u16 psc);//TIM3中断控制
 void TIM2_Counter_Init(void);//使用外部时钟计时
 void TIM2_CH1_Cap_Init(u32 arr,u16 psc);//TIM2_CH1的输入捕获初始化
-void TIM2_CH1_TIM4_CH1_Cap_Init(u32 arr,u16 psc);//TIM2_CH1_CH2的输入捕获初始化
-void TIM2_CH1_TIM5_CH1_Cap_Init(u32 arr,u16 psc);
-void TIM2_CH1_CH2_Cap_Init(u32 arr,u16 psc);
+void TIM5_CH1_CH2_Cap_Init(u32 arr,u16 psc);//TIM5_CH!_CH2的测相位初始化
 void ALL_UsedTIM_DEInit(void);//初始化，切换模式使用
